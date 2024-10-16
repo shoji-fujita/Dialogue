@@ -1,0 +1,79 @@
+{
+  "dialogues": [
+    {
+      "id": 1,
+      "text": "こんにちは！これは最初の会話です。今日はどうしますか？",
+      "sound": "greeting.mp3",
+      "motion": "wave",
+      "choices": [
+        {
+          "id": 1,
+          "text": "はじめまして！",
+          "nextDialogueId": 2
+        },
+        {
+          "id": 2,
+          "text": "天気はどうですか？",
+          "nextDialogueId": 4
+        },
+        {
+          "id": 3,
+          "text": "さようなら！",
+          "nextDialogueId": 3
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "次の会話に進みました！選択肢を選んでください。",
+      "choices": [
+        {
+          "id": 1,
+          "text": "さらに進む",
+          "nextDialogueId": 3
+        },
+        {
+          "id": 2,
+          "text": "戻る",
+          "nextDialogueId": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "text": "さらに次の会話です。会話はここで終わりです。",
+      "sound": "goodbye.mp3",
+      "motion": "nod",
+      "choices": []
+    },
+    {
+      "id": 4,
+      "text": "今日は晴れです！他に何か聞きたいですか？",
+      "choices": [
+        {
+          "id": 1,
+          "text": "天気の詳細",
+          "nextDialogueId": 5
+        },
+        {
+          "id": 2,
+          "text": "戻る",
+          "nextDialogueId": 1
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "text": "気温は25度で、湿度は60％です。",
+      "sound": "weather_detail.mp3",
+      "motion": "showWeather",
+      "choices": [
+        {
+          "id": 1,
+          "text": "戻る",
+          "nextDialogueId": 4
+        }
+      ]
+    }
+  ]
+}

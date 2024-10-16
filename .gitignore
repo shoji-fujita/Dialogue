@@ -70,3 +70,17 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# macOS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS Finder generated files
+.Spotlight-V100
+.Trashes
+
+# VSCode settings
+.vscode/
+
+/Assets/Fonts/NotoSansJP-Regular SDF.asset
