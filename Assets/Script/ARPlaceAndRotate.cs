@@ -48,7 +48,7 @@ public class ARPlaceAndRotate : MonoBehaviour
                     {
                         placedObject = Instantiate(objectToPlace, hitPose.position, hitPose.rotation);
 
-                        // キャラクターが出現した後、1秒後に会話を再開
+                        // キャラクターが出現した後、1秒後にDialogueManagerが会話を再開
                         StartCoroutine(RestartDialogueAfterDelay(1f));
                     }
                     else
@@ -88,7 +88,8 @@ public class ARPlaceAndRotate : MonoBehaviour
         yield return new WaitForSeconds(delay);  // 指定した秒数待機
         if (dialogueManager != null)
         {
-            dialogueManager.ShowDialogue(1);  // 1番目の会話を再開（適宜変更してください）
+            // DialogueManagerで会話を再開させる (ContinueFromARを呼び出す)
+            dialogueManager.ContinueFromAR();
         }
     }
 }

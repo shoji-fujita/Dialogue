@@ -11,7 +11,9 @@ public class Dialogue
 {
     public int id;
     public string text;
+    public string type;  // Optional type to control actions
     public List<Choice> choices;
+    public float seconds;  // Optional: 時間で自動進行するためのフィールド
 }
 
 [System.Serializable]
@@ -19,6 +21,7 @@ public class Choice
 {
     public string text;
     public int nextDialogueId;
+    public string type;
 }
 
 [System.Serializable]
@@ -38,13 +41,17 @@ public class DialogueManager : MonoBehaviour
     public Button skipButton;           // ARSceneに進むボタン
     public Button closeButton;          // CharacterSelectSceneに戻るボタン
     public float typingSpeed = 0.05f;
+
     private DialogueList dialogueList;
     private Dialogue currentDialogue;
     private int currentDialogueId = 1;
     private bool isTyping = false;
+    private int nextDialogueIdAfterAR = -1;  // AR後に再開するためのID
+    private Coroutine autoNextCoroutine;     // 自動で次に進むためのコルーチン
 
     void Awake()
     {
+        // シングルトンパターンでDialogueManagerのインスタンスを管理
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
@@ -58,13 +65,15 @@ public class DialogueManager : MonoBehaviour
 
     void Start()
     {
+        // 初期化: JSONを読み込み、ボタンにリスナーを追加
         LoadDialoguesFromJson();
         nextButton.onClick.AddListener(OnNextButtonClicked);
         skipButton.onClick.AddListener(OnSkipButtonPressed);  // skipButtonにリスナー追加
         closeButton.onClick.AddListener(OnCloseButtonPressed);  // closeButtonにリスナー追加
-        ShowDialogue(currentDialogueId);
+        ShowDialogue(currentDialogueId);  // 最初の会話を表示
     }
 
+    // JSONファイルから会話データをロードする
     void LoadDialoguesFromJson()
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, "dialogues.json");
@@ -80,6 +89,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 次の会話へ進むボタンが押された時の処理
     void OnNextButtonClicked()
     {
         if (!isTyping && (currentDialogue == null || currentDialogue.choices == null || currentDialogue.choices.Count == 0))
@@ -88,17 +98,30 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 特定の会話IDに基づいて会話を表示するメソッド
     public void ShowDialogue(int dialogueId)
     {
+        if (autoNextCoroutine != null)
+        {
+            StopCoroutine(autoNextCoroutine);  // 自動進行をキャンセル
+        }
+
         Dialogue dialogue = dialogueList.dialogues.Find(d => d.id == dialogueId);
 
         if (dialogue != null)
         {
             currentDialogue = dialogue;
+            currentDialogueId = dialogueId;  // 現在の会話IDを更新
             ClearChoices();
             choiceButtonParent.gameObject.SetActive(false);
 
             StartCoroutine(TypeSentence(dialogue.text, dialogue));
+
+            // 自動で次の会話に進むための秒数が設定されている場合
+            if (dialogue.seconds > 0 && (dialogue.choices == null || dialogue.choices.Count == 0))
+            {
+                autoNextCoroutine = StartCoroutine(AutoNextDialogue(dialogue.seconds, dialogue));
+            }
         }
         else
         {
@@ -106,6 +129,22 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 一定時間後に自動的に次の会話に進む。endの場合は終了処理を実行
+    IEnumerator AutoNextDialogue(float seconds, Dialogue dialogue)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        if (!string.IsNullOrEmpty(dialogue.type) && dialogue.type == "end")
+        {
+            OnCloseButtonPressed();  // 終了処理
+        }
+        else
+        {
+            ShowDialogue(currentDialogueId + 1);  // 次の会話に進む
+        }
+    }
+
+    // 会話を一文字ずつ表示するためのコルーチン
     IEnumerator TypeSentence(string dialogue, Dialogue currentDialogue)
     {
         isTyping = true;
@@ -119,6 +158,7 @@ public class DialogueManager : MonoBehaviour
 
         isTyping = false;
 
+        // 選択肢の表示
         if (currentDialogue.choices != null && currentDialogue.choices.Count > 0)
         {
             ShowChoices(currentDialogue.choices);
@@ -127,8 +167,15 @@ public class DialogueManager : MonoBehaviour
         {
             choiceButtonParent.gameObject.SetActive(false);
         }
+
+        // 特定のtypeがある場合はその動作を行う
+        if (!string.IsNullOrEmpty(currentDialogue.type))
+        {
+            HandleSpecialType(currentDialogue.type);
+        }
     }
 
+    // 選択肢を表示するメソッド
     void ShowChoices(List<Choice> choices)
     {
         if (choices != null && choices.Count > 0)
@@ -145,6 +192,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    // 選択肢ボタンを生成するメソッド
     void CreateChoiceButton(Choice choice)
     {
         GameObject choiceButton = Instantiate(choiceButtonPrefab, choiceButtonParent);
@@ -153,8 +201,15 @@ public class DialogueManager : MonoBehaviour
 
         Button button = choiceButton.GetComponent<Button>();
         button.onClick.AddListener(() => OnChoiceSelected(choice.nextDialogueId));
+
+        // 選択肢にtypeがある場合、そのtypeに応じた処理を追加
+        if (!string.IsNullOrEmpty(choice.type))
+        {
+            button.onClick.AddListener(() => HandleSpecialType(choice.type));
+        }
     }
 
+    // 選択肢が選ばれたときの処理
     void OnChoiceSelected(int nextDialogueId)
     {
         ClearChoices();
@@ -162,11 +217,42 @@ public class DialogueManager : MonoBehaviour
         ShowDialogue(nextDialogueId);
     }
 
+    // 選択肢ボタンをクリアするメソッド
     void ClearChoices()
     {
         foreach (Transform child in choiceButtonParent)
         {
             Destroy(child.gameObject);
+        }
+    }
+
+    // 特定のtypeに応じた処理
+    void HandleSpecialType(string type)
+    {
+        switch (type)
+        {
+            case "ar_start":
+                // ARSceneに進む前に、次に再開する会話IDを保存
+                nextDialogueIdAfterAR = currentDialogueId + 1;  // 次に再開するID
+                OnSkipButtonPressed();  // ARSceneに進む
+                break;
+            case "end":
+                // 秒数待たせてから終了する処理をAutoNextDialogueで実行するため、ここでは何もしない
+                break;
+            default:
+                Debug.LogWarning($"Unhandled type: {type}");  // 未処理のtypeを警告
+                break;
+        }
+    }
+
+    // ARシーン後に会話を再開するメソッド
+    public void ContinueFromAR()
+    {
+        if (nextDialogueIdAfterAR != -1)
+        {
+            dialogueWindow.SetActive(true);
+            ShowDialogue(nextDialogueIdAfterAR);  // ARシーン後に会話を再開
+            nextDialogueIdAfterAR = -1;  // リセット
         }
     }
 
@@ -183,6 +269,6 @@ public class DialogueManager : MonoBehaviour
     {
         SceneManager.LoadScene("CharacterSelectScene");
         dialogueWindow.SetActive(false);
-        Destroy(gameObject);
+        Destroy(gameObject);  // この場合のオブジェクトは削除する
     }
 }

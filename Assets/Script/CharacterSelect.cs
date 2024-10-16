@@ -30,9 +30,7 @@ public class CharacterSelect : MonoBehaviour
     {
         characters = new List<Character>
         {
-            new Character("Warrior", Resources.Load<Sprite>("Images/UnityGirl")),
-            new Character("Mage", Resources.Load<Sprite>("Images/UnityGirl")),
-            new Character("Archer", Resources.Load<Sprite>("Images/UnityGirl"))
+            new Character("Unityちゃん", Resources.Load<Sprite>("Images/UnityGirl"))
         };
 
         // キャラクター情報を基にボタンを生成

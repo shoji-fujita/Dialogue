@@ -2,9 +2,8 @@
   "dialogues": [
     {
       "id": 1,
-      "text": "こんにちは！これは最初の会話です。今日はどうしますか？",
-      "sound": "greeting.mp3",
-      "motion": "wave",
+      "text": "こんにちは！今日はどのようにお過ごしですか？",
+      "seconds": 5,
       "choices": [
         {
           "id": 1,
@@ -13,67 +12,115 @@
         },
         {
           "id": 2,
-          "text": "天気はどうですか？",
+          "text": "天気について聞きたい",
           "nextDialogueId": 4
-        },
-        {
-          "id": 3,
-          "text": "さようなら！",
-          "nextDialogueId": 3
         }
       ]
     },
     {
       "id": 2,
-      "text": "次の会話に進みました！選択肢を選んでください。",
+      "text": "よろしくお願いします。少しお話しましょう。",
+      "seconds": 4,
       "choices": [
         {
           "id": 1,
-          "text": "さらに進む",
-          "nextDialogueId": 3
-        },
-        {
-          "id": 2,
-          "text": "戻る",
-          "nextDialogueId": 1
+          "text": "到着した",
+          "nextDialogueId": 7,
+          "type": "ar_start"
         }
       ]
     },
     {
       "id": 3,
-      "text": "さらに次の会話です。会話はここで終わりです。",
-      "sound": "goodbye.mp3",
-      "motion": "nod",
-      "choices": []
-    },
-    {
-      "id": 4,
-      "text": "今日は晴れです！他に何か聞きたいですか？",
+      "text": "またお会いできる日を楽しみにしています！",
+      "seconds": 3,
       "choices": [
         {
           "id": 1,
-          "text": "天気の詳細",
-          "nextDialogueId": 5
+          "text": "到着した",
+          "nextDialogueId": 7,
+          "type": "ar_start"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "text": "今日は晴れですね。他に何か知りたいことはありますか？",
+      "seconds": 6,
+      "choices": [
+        {
+          "id": 1,
+          "text": "さようなら",
+          "nextDialogueId": 3
         },
         {
           "id": 2,
-          "text": "戻る",
-          "nextDialogueId": 1
+          "text": "詳細を教えて",
+          "nextDialogueId": 5
         }
       ]
     },
     {
       "id": 5,
-      "text": "気温は25度で、湿度は60％です。",
-      "sound": "weather_detail.mp3",
-      "motion": "showWeather",
+      "text": "気温は25度で、湿度は60％です。良い日ですね。",
+      "seconds": 5,
       "choices": [
         {
           "id": 1,
-          "text": "戻る",
-          "nextDialogueId": 4
+          "text": "到着した",
+          "nextDialogueId": 7,
+          "type": "ar_start"
         }
       ]
+    },
+    {
+      "id": 7,
+      "text": "こんにちは、私はARの世界に来ました。次はどのように進めましょうか？",
+      "seconds": 4,
+      "choices": [
+        {
+          "id": 1,
+          "text": "ARの世界を見せて",
+          "nextDialogueId": 8
+        },
+        {
+          "id": 2,
+          "text": "この世界での天気は？",
+          "nextDialogueId": 9
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "text": "こちらがARの世界です。たくさんの可能性が広がっています。",
+      "seconds": 5,
+      "choices": []
+    },
+    {
+      "id": 9,
+      "text": "ARの世界では天候の概念がありませんが、全てが新鮮です。",
+      "seconds": 5,
+      "choices": []
+    },
+    {
+      "id": 10,
+      "text": "ここからあなたが選ぶ未来が始まります。さあ、どこに進みますか？",
+      "seconds": 6,
+      "type": "photo",
+      "choices": [
+        {
+          "id": 1,
+          "text": "未来を探す",
+          "nextDialogueId": 11
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "text": "これで冒険は一旦終了です。またお会いしましょう。",
+      "seconds": 4,
+      "type": "end",
+      "choices": []
     }
   ]
 }
